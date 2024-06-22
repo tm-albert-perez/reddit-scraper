@@ -1,6 +1,7 @@
-from dagster import ConfigurableResource
-import praw
 import pandas as pd
+import praw
+from dagster import ConfigurableResource
+
 
 class RedditResource(ConfigurableResource):
     client_id: str
@@ -14,7 +15,7 @@ class RedditResource(ConfigurableResource):
             client_secret=self.client_secret,
             user_agent=self.user_agent,
         )
-    
+
     def get_subreddits_where(self, category: str, limit: int) -> pd.DataFrame:
         assert category in ["popular", "new"]
 
@@ -26,19 +27,21 @@ class RedditResource(ConfigurableResource):
 
         subreddits = []
         for subreddit in subreddits_gen:
-            subreddits.append({
-                "display_name": subreddit.display_name,
-                "url": f"https://www.reddit.com{subreddit.url}",
-                "id": subreddit.id,
-                "description": subreddit.description,
-                "public_description": subreddit.public_description,
-                "is_over_18": subreddit.over18,
-                "subscribers_count": subreddit.subscribers,
-                "created_at": subreddit.created_utc,
-            })
+            subreddits.append(
+                {
+                    "display_name": subreddit.display_name,
+                    "url": f"https://www.reddit.com{subreddit.url}",
+                    "id": subreddit.id,
+                    "description": subreddit.description,
+                    "public_description": subreddit.public_description,
+                    "is_over_18": subreddit.over18,
+                    "subscribers_count": subreddit.subscribers,
+                    "created_at": subreddit.created_utc,
+                }
+            )
 
         return pd.DataFrame(subreddits)
-          
+
     def get_subreddit(self, subreddit_name: str) -> pd.DataFrame:
         subreddit = self.client.subreddit(subreddit_name)
         data = {
@@ -52,9 +55,10 @@ class RedditResource(ConfigurableResource):
             "created_at": subreddit.created_utc,
         }
         return pd.DataFrame([data])
-        
 
-    def get_subreddit_posts_of_where(self, subreddit_name: str, category: str, limit: int) -> praw.models.listing.generator.ListingGenerator:
+    def get_subreddit_posts_of_where(
+        self, subreddit_name: str, category: str, limit: int
+    ) -> praw.models.listing.generator.ListingGenerator:
         assert category in ["hot", "new", "top", "controversial", "rising"]
 
         subreddit = self.client.subreddit(subreddit_name)
@@ -72,19 +76,21 @@ class RedditResource(ConfigurableResource):
 
         submissions = []
         for submission in submissions_gen:
-            submissions.append({
-                "subreddit_name": subreddit_name,
-                "submission_id": submission.id,
-                "title": submission.title,
-                "content": submission.selftext,
-                "author": submission.author.name,
-                "author_id": submission.author.id,
-                "url": submission.url,
-                "score": submission.score,
-                "upvote_ratio": submission.upvote_ratio,
-                "num_comments": submission.num_comments,
-                "over_18": submission.over_18,
-                "created_at": submission.created_utc,
-            })
+            submissions.append(
+                {
+                    "subreddit_name": subreddit_name,
+                    "submission_id": submission.id,
+                    "title": submission.title,
+                    "content": submission.selftext,
+                    "author": submission.author.name,
+                    "author_id": submission.author.id,
+                    "url": submission.url,
+                    "score": submission.score,
+                    "upvote_ratio": submission.upvote_ratio,
+                    "num_comments": submission.num_comments,
+                    "over_18": submission.over_18,
+                    "created_at": submission.created_utc,
+                }
+            )
 
         return pd.DataFrame(submissions)
