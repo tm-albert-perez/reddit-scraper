@@ -1,0 +1,13 @@
+from dagster import ConfigurableResource
+import sqlite3
+import os
+
+class SQLiteResource(ConfigurableResource):
+    db_path: str
+    
+    def connect(self):
+        if not os.path.exists(self.db_path):
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            with open(self.db_path, "w") as f:
+                pass
+        return sqlite3.connect(self.db_path)        
