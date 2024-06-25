@@ -3,4 +3,4 @@ install :
 	pip install -e ".[dev]"
 
 lint:
-	pylint --fail-under=8 src
+	pylint -v --fail-under=8 src
